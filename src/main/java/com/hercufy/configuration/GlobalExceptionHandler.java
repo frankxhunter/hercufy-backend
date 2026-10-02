@@ -1,0 +1,124 @@
+package com.hercufy.configuration;
+
+import com.hercufy.exceptions.GoogleUnauthorizedException;
+import com.hercufy.exceptions.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    private final static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex) {
+        StringBuilder errorMessage = new StringBuilder();
+
+        // Obtener errores de validacion
+        ex.getBindingResult().getAllErrors().forEach((e) -> {
+            String fieldname = ((FieldError) e).getField();
+            String message = e.getDefaultMessage();
+
+            errorMessage.append("Field: ").append(fieldname)
+                    .append(" - ").append(message).append(";\n");
+        });
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorMessage);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleValidationException(ConstraintViolationException ex) {
+        StringBuilder errorMessage = new StringBuilder();
+
+        // Obtener errores de validacion
+        ex.getConstraintViolations().forEach((e) -> {
+            String fieldName = e.getPropertyPath().toString();
+            if (fieldName.contains(".")) {
+                fieldName.substring(fieldName.indexOf(".") + 1);
+            }
+            String message = e.getMessage();
+
+            errorMessage.append("Field: ").append(fieldName)
+                    .append(" - ").append(message).append(";\n");
+        });
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorMessage);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(ResourceNotFoundException ex,
+                                                          HttpServletRequest req) {
+        log.warn("Resource not found: {} - Path {}", ex.getMessage(), req.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleTypeMatchException(MethodArgumentTypeMismatchException ex) {
+        String msg = String.format("Invalid type match with %s parameter", ex.getName());
+        log.warn(msg);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+    }
+
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        e.printStackTrace();
+        Throwable cause = e.getRootCause();
+        if (cause != null) {
+            String msg = cause.getMessage();
+            boolean postgresDuplicate = msg != null
+                    && (msg.contains("duplicate key") || msg.contains("unique constraint"))
+                    && msg.toLowerCase().contains("email");
+            if (postgresDuplicate) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Email: An account with this email already exists");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("An error ocurred: " + e.getMessage());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    // Spring Security lanza esto en el login cuando el usuario existe pero
+    // UserDetailsServiceImpl lo marca como "no enabled" (email sin verificar), antes
+    // incluso de comprobar la contrasena. Sin este manejador especifico caia en el
+    // handler generico de mas abajo y devolvia un 500 en vez de un error claro.
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<?> handleDisabledException(DisabledException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Email not verified. Please check your inbox to confirm your account.");
+    }
+
+    @ExceptionHandler(GoogleUnauthorizedException.class)
+    public ResponseEntity<?> handleBadCredentialsException(GoogleUnauthorizedException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleGeneralException(Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("An error ocurred: " + e.getMessage());
+    }
+}

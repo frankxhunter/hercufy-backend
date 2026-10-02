@@ -1,0 +1,222 @@
+[
+ {
+  "id": "Barbell_Bench_Press_-_Medium_Grip",
+  "nameEs": "Press banca con barra"
+ },
+ {
+  "id": "Incline_Dumbbell_Press",
+  "nameEs": "Press inclinado con mancuernas"
+ },
+ {
+  "id": "Dumbbell_Flyes",
+  "nameEs": "Aperturas con mancuernas"
+ },
+ {
+  "id": "Cable_Crossover",
+  "nameEs": "Cruce de poleas"
+ },
+ {
+  "id": "Dips_-_Chest_Version",
+  "nameEs": "Fondos para pecho"
+ },
+ {
+  "id": "Barbell_Incline_Bench_Press_-_Medium_Grip",
+  "nameEs": "Press inclinado con barra"
+ },
+ {
+  "id": "Standing_Military_Press",
+  "nameEs": "Press militar de pie"
+ },
+ {
+  "id": "Side_Lateral_Raise",
+  "nameEs": "Elevaciones laterales"
+ },
+ {
+  "id": "Seated_Dumbbell_Press",
+  "nameEs": "Press de hombros sentado con mancuernas"
+ },
+ {
+  "id": "Arnold_Dumbbell_Press",
+  "nameEs": "Press Arnold"
+ },
+ {
+  "id": "Front_Dumbbell_Raise",
+  "nameEs": "Elevaciones frontales con mancuernas"
+ },
+ {
+  "id": "Triceps_Pushdown",
+  "nameEs": "Extensión de tríceps en polea"
+ },
+ {
+  "id": "Triceps_Pushdown_-_Rope_Attachment",
+  "nameEs": "Extensión de tríceps con cuerda"
+ },
+ {
+  "id": "Dips_-_Triceps_Version",
+  "nameEs": "Fondos para tríceps"
+ },
+ {
+  "id": "Lying_Triceps_Press",
+  "nameEs": "Press francés tumbado"
+ },
+ {
+  "id": "Standing_Dumbbell_Triceps_Extension",
+  "nameEs": "Extensión de tríceps con mancuerna"
+ },
+ {
+  "id": "Close-Grip_Barbell_Bench_Press",
+  "nameEs": "Press banca agarre cerrado"
+ },
+ {
+  "id": "Pullups",
+  "nameEs": "Dominadas"
+ },
+ {
+  "id": "Chin-Up",
+  "nameEs": "Dominadas supinas"
+ },
+ {
+  "id": "Wide-Grip_Lat_Pulldown",
+  "nameEs": "Jalón al pecho agarre ancho"
+ },
+ {
+  "id": "Bent_Over_Barbell_Row",
+  "nameEs": "Remo con barra inclinado"
+ },
+ {
+  "id": "One-Arm_Dumbbell_Row",
+  "nameEs": "Remo con mancuerna a una mano"
+ },
+ {
+  "id": "Seated_Cable_Rows",
+  "nameEs": "Remo sentado en polea"
+ },
+ {
+  "id": "Barbell_Deadlift",
+  "nameEs": "Peso muerto"
+ },
+ {
+  "id": "Barbell_Curl",
+  "nameEs": "Curl con barra"
+ },
+ {
+  "id": "Dumbbell_Bicep_Curl",
+  "nameEs": "Curl de bíceps con mancuernas"
+ },
+ {
+  "id": "Hammer_Curls",
+  "nameEs": "Curl martillo"
+ },
+ {
+  "id": "Preacher_Curl",
+  "nameEs": "Curl predicador"
+ },
+ {
+  "id": "Barbell_Full_Squat",
+  "nameEs": "Sentadilla con barra"
+ },
+ {
+  "id": "Leg_Press",
+  "nameEs": "Prensa de piernas"
+ },
+ {
+  "id": "Romanian_Deadlift",
+  "nameEs": "Peso muerto rumano"
+ },
+ {
+  "id": "Leg_Extensions",
+  "nameEs": "Extensión de cuádriceps"
+ },
+ {
+  "id": "Seated_Leg_Curl",
+  "nameEs": "Curl femoral sentado"
+ },
+ {
+  "id": "Lying_Leg_Curls",
+  "nameEs": "Curl femoral tumbado"
+ },
+ {
+  "id": "Standing_Calf_Raises",
+  "nameEs": "Elevación de talones de pie"
+ },
+ {
+  "id": "Seated_Calf_Raise",
+  "nameEs": "Elevación de talones sentado"
+ },
+ {
+  "id": "Barbell_Hip_Thrust",
+  "nameEs": "Hip thrust con barra"
+ },
+ {
+  "id": "Dumbbell_Lunges",
+  "nameEs": "Zancadas con mancuernas"
+ },
+ {
+  "id": "Plank",
+  "nameEs": "Plancha"
+ },
+ {
+  "id": "Crunches",
+  "nameEs": "Abdominales crunch"
+ },
+ {
+  "id": "Hanging_Leg_Raise",
+  "nameEs": "Elevación de piernas colgado"
+ },
+ {
+  "id": "Face_Pull",
+  "nameEs": "Face pull"
+ },
+ {
+  "id": "Reverse_Flyes",
+  "nameEs": "Aperturas invertidas"
+ },
+ {
+  "id": "Barbell_Shrug",
+  "nameEs": "Encogimientos con barra"
+ },
+ {
+  "id": "Dumbbell_Shrug",
+  "nameEs": "Encogimientos con mancuernas"
+ },
+ {
+  "id": "Butterfly",
+  "nameEs": "Máquina de aperturas (mariposa)"
+ },
+ {
+  "id": "Bodyweight_Squat",
+  "nameEs": "Sentadilla con peso corporal"
+ },
+ {
+  "id": "Goblet_Squat",
+  "nameEs": "Sentadilla goblet"
+ },
+ {
+  "id": "Cable_Crunch",
+  "nameEs": "Crunch en polea"
+ },
+ {
+  "id": "Machine_Shoulder_Military_Press",
+  "nameEs": "Press de hombros en máquina"
+ },
+ {
+  "id": "Leverage_Chest_Press",
+  "nameEs": "Press de pecho en máquina"
+ },
+ {
+  "id": "Smith_Machine_Squat",
+  "nameEs": "Sentadilla en multipower"
+ },
+ {
+  "id": "Hack_Squat",
+  "nameEs": "Sentadilla hack"
+ },
+ {
+  "id": "Barbell_Rear_Delt_Row",
+  "nameEs": "Remo para deltoides posterior"
+ },
+ {
+  "id": "Cable_Seated_Crunch",
+  "nameEs": "Crunch sentado en polea"
+ }
+]

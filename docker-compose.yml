@@ -1,0 +1,52 @@
+# Levanta la base de datos y, opcionalmente, el backend empaquetado en su propia
+# imagen (build a partir de "dockerfile"). Mientras se esta desarrollando, suele ir
+# mejor `docker compose up -d database` + `mvn spring-boot:run` en local (recarga mas
+# rapida); para probar el backend tal cual quedaria empaquetado, `docker compose up
+# --build` levanta los dos. El compose con nginx delante, para produccion, se retoma
+# en la fase de despliegue (ver plan tecnico, seccion 10, fase 6).
+services:
+  database:
+    image: postgres:15
+    container_name: hercufy-db
+    environment:
+      POSTGRES_USER: ${MY_USER}
+      POSTGRES_PASSWORD: ${MY_PASSWORD}
+      POSTGRES_DB: ${MY_DATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MY_USER} -d ${MY_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - hercufy-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: hercufy-backend
+    env_file:
+      - .env
+    environment:
+      # Dentro de la red de docker compose, el backend no llega a la base de datos por
+      # "localhost" (eso apunta al propio contenedor del backend): tiene que usar el
+      # nombre del servicio, "database". El resto de variables (JWT_SECRET, MAIL_*,
+      # etc.) se toman tal cual del .env via env_file.
+      MY_DATABASE_URL: jdbc:postgresql://database:5432/${MY_DATABASE}
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - hercufy-network
+
+volumes:
+  postgres_data:
+
+networks:
+  hercufy-network:

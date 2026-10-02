@@ -1,0 +1,12 @@
+package com.hercufy.repositories;
+
+import com.hercufy.models.PlanDay;
+import com.hercufy.models.PlanExercise;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface PlanExerciseRepository extends JpaRepository<PlanExercise, UUID> {
+    Optional<PlanExercise> findByIdAndPlanDay(UUID id, PlanDay planDay);
+}

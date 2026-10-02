@@ -1,0 +1,8 @@
+# El .env tiene secretos y las variables ya se pasan en tiempo de ejecucion via
+# env_file en docker-compose.yml: no hace falta (ni conviene) que entre en la imagen.
+.env
+target/
+.git
+.idea
+.vscode
+*.iml

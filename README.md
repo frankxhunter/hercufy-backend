@@ -6,12 +6,7 @@ plantilla [Spring-template](https://github.com/frankxhunter/Spring-template).
 Esta fase cubre **auth completo + catalogo de ejercicios + CRUD de rutinas**. No hay
 ningun endpoint de IA todavia (eso es la siguiente fase, sin tocar aqui).
 
-> Nota sobre como se ha hecho este proyecto: se ha escrito y revisado con mucho cuidado,
-> pero **no se ha podido compilar ni ejecutar** en el entorno donde se generó (sin acceso
-> a Maven Central ni a Docker). Se ha comparado línea a línea contra la plantilla
-> original para todo lo que se reutiliza sin cambios, y se ha revisado a mano el resto,
-> pero conviene que la primera vez que lo compiles vayas con margen por si aparece algún
-> error de compilación suelto que aquí no se pudo detectar.
+
 
 ## Poner en marcha
 

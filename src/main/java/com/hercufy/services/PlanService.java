@@ -92,7 +92,7 @@ public class PlanService {
             plan.getDays().add(day);
         }
 
-        return toResponse(planRepository.save(plan));
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     @Transactional
@@ -106,7 +106,7 @@ public class PlanService {
             applyActive(user, plan, request.getActive());
         }
 
-        return toResponse(planRepository.save(plan));
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     @Transactional
@@ -141,7 +141,7 @@ public class PlanService {
         day.setPosition(plan.getDays().size());
         plan.getDays().add(day);
 
-        return toResponse(planRepository.save(plan));
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     @Transactional
@@ -158,7 +158,7 @@ public class PlanService {
         TrainingPlan plan = findOwnedPlan(user, planId);
         PlanDay day = findDay(plan, dayId);
         plan.getDays().remove(day);
-        return toResponse(planRepository.save(plan));
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     // ---- Ejercicios de un dia ----
@@ -178,7 +178,11 @@ public class PlanService {
         pe.setPosition(day.getExercises().size());
         day.getExercises().add(pe);
 
-        return toResponse(planRepository.save(plan));
+        // saveAndFlush y no save: el id del ejercicio nuevo (y el de los días creados junto a la
+        // rutina) se genera al insertar. Con save() la respuesta se armaba antes del flush y
+        // llegaba al cliente con id null; desde ahí reorder y updateExercise fallaban porque la
+        // URL llevaba "null" en lugar del id de la entrada.
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     @Transactional
@@ -192,7 +196,7 @@ public class PlanService {
         pe.setReps(request.getReps());
         pe.setWeightKg(request.getWeightKg());
 
-        return toResponse(planRepository.save(plan));
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     @Transactional
@@ -201,7 +205,7 @@ public class PlanService {
         PlanDay day = findDay(plan, dayId);
         PlanExercise pe = findPlanExercise(day, exerciseEntryId);
         day.getExercises().remove(pe);
-        return toResponse(planRepository.save(plan));
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     @Transactional
@@ -220,7 +224,7 @@ public class PlanService {
         }
         day.getExercises().sort((a, b) -> Integer.compare(a.getPosition(), b.getPosition()));
 
-        return toResponse(planRepository.save(plan));
+        return toResponse(planRepository.saveAndFlush(plan));
     }
 
     // ---- Helpers ----

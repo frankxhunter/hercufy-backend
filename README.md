@@ -27,7 +27,8 @@ ningun endpoint de IA todavia (eso es la siguiente fase, sin tocar aqui).
 3. Al arrancar por primera vez, la app importa el catálogo de ejercicios (ver más
    abajo) y crea las tablas sola (`ddl-auto=update`; ver el TODO de Flyway en
    `application.properties`).
-4. La API queda en `http://localhost:8080/api/...`.
+4. La API queda en `http://localhost:8080/api/...`. Para probar en un móvil ver la
+   sección «CORS y pruebas desde el móvil».
 
 El correo (verificacion de email) y el login con Google pueden dejarse sin configurar:
 la app arranca igual y esos dos flujos concretos simplemente no funcionaran del todo
@@ -388,10 +389,11 @@ días y los ejercicios de cada día ya resueltos contra el catálogo):
 |---|---|---|
 | 400 | Validación fallida (campo obligatorio, formato, límites) | Texto: `Field: <campo> - <mensaje>;` por cada campo |
 | 401 | Refresh token inválido/caducado/revocado | Texto con el motivo |
-| 403 | Login incorrecto, email sin verificar, token de Google inválido | Texto con el motivo |
-| 404 | Recurso no encontrado o no es tuyo (rutina, día, ejercicio, id de catálogo) | Texto con el motivo |
+| 403 | Login incorrecto, email sin verificar, token de Google inválido, o access token ausente/caducado/inválido en una ruta protegida | Texto con el motivo (en las rutas protegidas el cuerpo va vacío) |
+| 404 | Recurso no encontrado, no es tuyo, o ruta inexistente | Texto con el motivo |
 | 409 | Email ya registrado | Texto: "Email: An account with this email already exists" |
 | 429 | Límite de peticiones superado (100/min por IP, para toda la API) | JSON: `{"error": "Too many requests. Please try again later."}` |
+| 405 | Método HTTP no soportado en esa ruta | Texto con el motivo |
 | 500 | Error inesperado | Texto: "An error ocurred: …" |
 
 ## Decisiones y limitaciones de esta fase
@@ -420,16 +422,61 @@ días y los ejercicios de cada día ya resueltos contra el catálogo):
 
 ## Conectar el frontend
 
-El prototipo de Angular/Ionic hoy usa datos simulados detrás de dos contratos
-(`PlanRepository` y `AssistantPort`, en `app.config.ts`). Cuando toque conectar esta
-API, hay que:
+**Ya está conectado.** `hercufy-frontend` habla con esta API de verdad: `HttpPlanRepository`
+para las rutinas, `HttpExerciseRepository` para el catálogo, y `AuthService` + interceptor para
+la sesión (access token + refresh con rotación). `AssistantPort` (Hercules) sigue siendo local y
+por reglas, hasta la fase de IA.
 
-1. Añadir un `HttpPlanRepository` que llame a `/api/plans/...` con estas mismas formas.
-2. Añadir un servicio de autenticación real contra `/api/auth` y `/api/users/me`,
-   guardando el access token y usando el refresh token para renovarlo.
-3. Apuntar `ExerciseService` del frontend a `/api/exercises` en vez de al catálogo
-   embebido (los parámetros `q` y `muscleGroup`, y la forma de los grupos musculares,
-   ya están pensados para que coincidan).
+Todo lo que la app necesita saber de este lado:
 
-`AssistantPort` (Hercules) se queda con su implementación simulada hasta la siguiente
-fase, que sí tocará IA.
+- **Dónde está la API**: el frontend la deduce del host desde el que se sirve (mismo host,
+  puerto 8080) o la compila con `--define API_BASE`. Ver `hercufy-frontend/README.md`, sección
+  «Cómo decide la URL de la API».
+- **Confirmación de email sin SMTP**: mira el log del backend, donde aparece
+  `Token de verificacion: ...` cuando el envío falla, y entra en
+  `/confirm-email?token=...` en el frontend. Así se prueban cuentas nuevas sin configurar correo.
+
+## CORS y pruebas desde el móvil
+
+La app se puede probar en un teléfono real sin tocar nada: `ng serve --host 0.0.0.0` en el
+equipo de desarrollo y abrir `http://TU_IP:4200` en el móvil. La app deduce que la API está en
+`http://TU_IP:8080`, y el backend acepta el origen.
+
+Por defecto se permiten (`SecurityConfig`):
+
+| Origen | Cuándo |
+|---|---|
+| `http://localhost`, `http://localhost:*` | `ng serve` y cualquier puerto local |
+| `https://localhost` | WebView de Capacitor en Android |
+| `capacitor://localhost` | WebView de Capacitor en iOS |
+| `http://127.0.0.1:*` | alias de loopback |
+| `http://192.168.*:*`, `http://10.*:*`, `http://172.16-31.*:*` | red privada: pruebas desde el móvil en la wifi |
+
+Para cualquier otro origen (un dominio propio, por ejemplo) define `CORS_ALLOWED_ORIGINS` con
+los valores separados por coma:
+
+```bash
+CORS_ALLOWED_ORIGINS=https://app.hercufy.com,https://www.hercufy.com
+```
+
+Diagnóstico rápido cuando el móvil dice `net::ERR_FAILED` (casi siempre es CORS):
+
+```bash
+curl -i -H "Origin: http://192.168.1.52:4200" http://localhost:8080/api/plans
+# debe verse Access-Control-Allow-Origin: http://192.168.1.52:4200
+```
+
+Esa lista de red privada es una decisión de desarrollo: no la dejes así en producción, acota
+`CORS_ALLOWED_ORIGINS` a los dominios reales.
+
+## Códigos de estado que devuelven
+
+Además de los errores de la tabla de arriba, hay dos comportamientos que conviene conocer
+porque parecen contradictorios:
+
+- **403 también es «no estás autenticado»**: con el access token caducado, ausente o de una cuenta
+  borrada, Spring responde 403, no 401. El interceptor del frontend trata 401 y 403 igual y
+  renueva la sesión, por eso funciona. Solo `/api/auth/refresh` responde 401 cuando el refresh
+  token no vale.
+- **404 y 405**: una ruta inexistente o un método HTTP equivocado devuelven su código correcto
+  (antes caían en el handler genérico y salían como 500).

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -55,7 +56,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        } catch (IllegalArgumentException ignored) {
+        } catch (AuthenticationException | IllegalArgumentException ex) {
+            // Token de una cuenta que ya no existe (borrada) o token corrupto: la peticion sigue
+            // sin autenticar en lugar de reventar con un 500. Las rutas /api/** la rechazaran
+            // con un 401 desde las reglas de autorizacion.
             SecurityContextHolder.clearContext();
         }
 

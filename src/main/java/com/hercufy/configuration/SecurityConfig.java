@@ -59,7 +59,18 @@ public class SecurityConfig {
             @Value("${application.cors.allowed-origins:}") String[] allowedOrigins) {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(Stream.concat(
-                Stream.of("http://localhost", "http://localhost:*", "capacitor://localhost"),
+                // Local: el ng serve de desarrollo, la app servida como PWA y el contenedor de
+                // Capacitor. Red privada: es lo que hace posible abrir la app en el movil por
+                // http://192.168.x.x:4200 sin tener que declarar cada IP. En produccion se acota
+                // con CORS_ALLOWED_ORIGINS (esta lista de abajo solo son valores por defecto).
+                Stream.of("http://localhost", "http://localhost:*", "https://localhost",
+                        "capacitor://localhost", "http://127.0.0.1:*", "http://192.168.*:*", "http://10.*:*",
+                        "http://172.16.*:*", "http://172.17.*:*", "http://172.18.*:*",
+                        "http://172.19.*:*", "http://172.20.*:*", "http://172.21.*:*",
+                        "http://172.22.*:*", "http://172.23.*:*", "http://172.24.*:*",
+                        "http://172.25.*:*", "http://172.26.*:*", "http://172.27.*:*",
+                        "http://172.28.*:*", "http://172.29.*:*", "http://172.30.*:*",
+                        "http://172.31.*:*"),
                 Arrays.stream(allowedOrigins)
                         .map(String::trim)
                         .filter(origin -> !origin.isEmpty())

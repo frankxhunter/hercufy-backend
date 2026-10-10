@@ -14,7 +14,9 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 
@@ -113,6 +115,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadCredentialsException(GoogleUnauthorizedException e) {
         log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    // Peticiones a rutas que no existen (por ejemplo, una version antigua de la app contra
+    // un backend nuevo) y metodos HTTP equivocados. Sin esto caian en el handler generico y
+    // devolvian un 500, que en el movil se traduce en un error de servidor sin pistas.
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<?> handleNoResourceFound(NoResourceFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Recurso no encontrado: " + e.getResourcePath());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
